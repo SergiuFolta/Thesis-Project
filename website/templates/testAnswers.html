@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}{{ test.title }} Answers{% endblock %}
+
+{% block content %}
+<form method="POST">
+
+    <div class="text-center">
+
+        <div class="row row-cols-3">
+
+            <div class="col-1"></div>
+
+            <div class="col-10">
+                <div class="card border-dark mt-5">
+                    <div class="card-body">
+
+                        <div class="h1">
+                                <b>{{ test.title }} Answers</b>
+                        </div>
+
+                        <div class="mt-3">
+                            <b>Please fill out the answers for the automatic grading of the test!</b>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-1"></div>
+
+            {% for question in test.questions %}
+
+            <div class="col-1"></div>
+
+            <div class="col-10">
+                <div class="card border-dark mt-3">
+                    <div class="card-body">
+
+                        <div class="h2">
+                            <b>Question {{ loop.index }}</b>
+                        </div>
+
+                        <div class="text-start mt-3">
+                            <b>{{ question.text }}</b>
+                        </div>
+
+                        {% if question.type=="shortAnswer" %}
+                        <input class="form-control mt-1" type="text" name="answer{{ loop.index }}" placeholder="Answer">
+
+                        {% elif question.type=="longAnswer" %}
+                        <textarea class="form-control mt-1" name="answer{{ loop.index }}" rows="3" placeholder="Answer"></textarea>
+
+                        {% elif question.type=="multipleChoice" %}
+                        {% set questionid = loop.index %}
+                            {% for option in question.options %}
+
+                        <div class="form-check text-start mt-1">
+                            <input class="form-check-input" type="radio" id="option{{ questionid }}{{ loop.index }}" name="answer{{ questionid }}" value="option{{ questionid }}{{ loop.index }}">
+                            <label class="form-check-label" for="option{{ questionid }}{{ loop.index }}">{{ option.text }}</label>
+                        </div>
+
+                            {% endfor %}
+
+                        {% elif question.type=="checkboxes" %}
+                        {% set questionid = loop.index %}
+                        {% for option in question.options %}
+
+                        <div class="form-check text-start mt-1">
+                              <input class="form-check-input" type="checkbox" id="option{{ questionid }}{{ loop.index }}" name="answer{{ questionid }}" value="option{{ questionid }}{{ loop.index }}">
+                              <label class="form-check-label" for="option{{ questionid }}{{ loop.index }}">{{ option.text }}</label>
+                        </div>
+
+                        {% endfor %}
+
+                        {% elif question.type=="dropdown" %}
+                        {% set questionid = loop.index %}
+
+                        <select class="form-select mt-1" name="answer{{ questionid }}">
+                            {% for option in question.options %}
+                            <option value="option{{ questionid }}{{ loop.index }}">{{ option.text }}</option>
+                            {% endfor %}
+                        </select>
+
+                        {% elif question.type=="matching" %}
+                        {% set questionid = loop.index %}
+                        <table class="table mt-1">
+                            <thead>
+                                <tr>
+                                    <th scope="col"></th>
+                                    {% for option in question.options %}
+                                    {% if not option.row %}
+                                    <th scope="col">{{ option.text }}</th>
+                                    {% endif %}
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for option in question.options %}
+                                {% set rowid = loop.index %}
+                                {% if option.row %}
+                                 <tr>
+                                     <th scope="row">{{ option.text }}</th>
+                                     {% for option in question.options %}
+                                     {% if not option.row %}
+                                     <td>
+                                         <input class="form-check-input" type="checkbox" id="option{{ questionid }}{{ rowid }}{{ loop.index }}" name="answer{{ questionid }}" value="option{{ questionid }}{{ rowid }}{{ loop.index }}">
+                                     </td>
+                                     {% endif %}
+                                     {% endfor %}
+                                {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                        {% elif question.type=="fileUpload" %}
+
+                        <div class="text-start mt-1">
+                            You can't set an answer for a file upload question!
+                        </div>
+
+                        <input class="form-control mt-1" type="file" name="answer{{ loop.index }}" disabled>
+
+                        {% endif %}
+
+                        <div class="text-end mt-3">
+                            <b>Points {{ question.points }}</b>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-1"></div>
+
+            {% endfor %}
+
+        </div>
+
+        <div class="mt-3">
+            <input class="btn btn-dark btn-lg col-10" type="submit" name = "submitAnswers" value = "Submit Answers">
+        </div>
+
+    </div>
+
+</form>
+{% endblock %}

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body style="background-color:#e2ffec;">
+
+    <div class="text-center">
+
+        <div class="row row-cols-3">
+
+            <div class="col-1"></div>
+
+            <div class="col-10">
+                <div class="card border-dark mt-5">
+                    <div class="card-body">
+
+                        <div class="h1">
+                                <b>{{ test.title }}</b>
+                        </div>
+
+                        <div class="text-start mt-3">
+                            <b>First Name: </b>{{ response.first_name }}
+                        </div>
+
+                        <div class="text-start mt-3">
+                            <b>Last Name: </b>{{ response.last_name }}
+                        </div>
+
+                        <div class="text-start mt-3">
+                            <b>Email: </b>{{ response.email }}
+                        </div>
+
+                        <div class="text-start mt-3">
+                            <b>Grade: </b>{{ response.grade }}
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-1"></div>
+
+            {% for question in test.questions %}
+
+            <div class="col-1"></div>
+
+            <div class="col-10">
+                <div class="card border-dark mt-3">
+                    <div class="card-body">
+
+                        <div class="h2">
+                            <b>Question {{ loop.index }}</b>
+                        </div>
+
+                        <div class="text-start mt-3">
+                            <b>{{ question.text }}</b>
+                        </div>
+
+                        {% if question.type=="shortAnswer" or question.type=="longAnswer" %}
+                        <div class="text-start mt-1">
+                            {{ response.answers[loop.index - 1].answer }}
+                        </div>
+
+                        {% elif question.type=="multipleChoice" %}
+                        {% set questionid = loop.index %}
+                            {% for option in question.options %}
+
+                        <div class="form-check text-start mt-1">
+                            {% set optionID = "option" ~ questionid ~ loop.index %}
+                            <input class="form-check-input" type="radio" id="option{{ questionid }}{{ loop.index }}" name="answer{{ questionid }}" value="option{{ questionid }}{{ loop.index }}" {% if optionID in checked %} checked {% endif %} disabled>
+                            <label class="form-check-label" for="option{{ questionid }}{{ loop.index }}">{{ option.text }}</label>
+                        </div>
+
+                            {% endfor %}
+
+                        {% elif question.type=="checkboxes" %}
+                        {% set questionid = loop.index %}
+                        {% for option in question.options %}
+
+                        <div class="form-check text-start mt-1">
+                            {% set optionID = "option" ~ questionid ~ loop.index %}
+                            <input class="form-check-input" type="checkbox" id="option{{ questionid }}{{ loop.index }}" name="answer{{ questionid }}" value="option{{ questionid }}{{ loop.index }}" {% if optionID in checked %} checked {% endif %} disabled>
+                            <label class="form-check-label" for="option{{ questionid }}{{ loop.index }}">{{ option.text }}</label>
+                        </div>
+
+                        {% endfor %}
+
+                        {% elif question.type=="dropdown" %}
+                        {% set questionid = loop.index %}
+
+                        <select class="form-select mt-1" name="answer{{ questionid }}" disabled>
+                            {% for option in question.options %}
+                                {% set optionID = "option" ~ questionid ~ loop.index %}
+                                <option value="option{{ questionid }}{{ loop.index }}" {% if optionID in checked %} selected {% endif %}>{{ option.text }}</option>
+                            {% endfor %}
+                        </select>
+
+                        {% elif question.type=="matching" %}
+                        {% set questionid = loop.index %}
+                        <table class="table mt-1">
+                            <thead>
+                                <tr>
+                                    <th scope="col"></th>
+                                    {% for option in question.options %}
+                                    {% if not option.row %}
+                                    <th scope="col">{{ option.text }}</th>
+                                    {% endif %}
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for option in question.options %}
+                                {% set rowid = loop.index %}
+                                {% if option.row %}
+                                 <tr>
+                                     <th scope="row">{{ option.text }}</th>
+                                     {% for option in question.options %}
+                                     {% if not option.row %}
+                                     <td>
+                                         {% set optionID = "option" ~ questionid ~ rowid ~ loop.index %}
+                                         <input class="form-check-input" type="checkbox" id="option{{ questionid }}{{ rowid }}{{ loop.index }}" name="answer{{ questionid }}" value="option{{ questionid }}{{ rowid }}{{ loop.index }}" {% if optionID in checked %} checked {% endif %} disabled>
+                                     </td>
+                                     {% endif %}
+                                     {% endfor %}
+                                {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                        {% elif question.type=="fileUpload" %}
+                        <div class="text-start mt-1">
+                            {% if response.answers[loop.index - 1].answer=="nofile" %}
+                            No file was uploaded!
+                            {% else %}
+                            <b>Answer to Question{{ loop.index }}</b>
+                            {% endif %}
+                        </div>
+
+                        {% endif %}
+
+                        <div class="text-start mt-3">
+                            <b>Comments</b>
+                        </div>
+
+                       {{ response.answers[loop.index - 1].comment }}
+
+                        <div class="text-end mt-3">
+                            <b>Points: </b>{{ response.answers[loop.index - 1].points }}/{{ question.points }}
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-1"></div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+     <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+</body>
+</html>

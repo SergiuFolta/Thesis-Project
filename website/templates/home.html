@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<form method="POST" id="form">
+
+     <div class="text-center">
+
+        <div class="row row-cols-3">
+
+            <div class="col-1"></div>
+
+            <div class="col-10">
+                <div class="card border-dark mt-5">
+                    <div class="card-body">
+
+                        <div class="h1">
+                                <b>Welcome back, {{user.name}}!</b>
+                        </div>
+
+                        <table class="table mt-3">
+                            <thead>
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Title</th>
+                                    <th scope="col">Code</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% if user.tests %}
+                                {% for test in user.tests %}
+                                <tr>
+                                    <th scope="row">{{ loop.index }}</th>
+                                    <td>
+                                        {{ test.title }}
+                                    </td>
+                                    <td>
+                                        {{ test.code }}
+                                    </td>
+                                    {% if test.active %}
+                                    <td style="color:green">
+                                        Active
+                                    </td>
+                                    {% else %}
+                                    <td style="color:red">
+                                        Inactive
+                                    </td>
+                                    {% endif %}
+                                    <td>
+                                        <input class="btn btn-dark" type="submit" name="gradeTest{{ loop.index }}" value="Grade">
+                                        {% if test.active %}
+                                        <input class="btn btn-dark" type="submit" name="inactivateTest{{ loop.index }}" value="Inactivate">
+                                        {% else %}
+                                        <input class="btn btn-dark" type="submit" name="activateTest{{ loop.index }}" value=" Activate ">
+                                        {% endif %}
+                                        <input class="btn btn-dark" type="submit" name="modifyTest{{ loop.index }}" value="Modify" onclick="confirmAction()">
+                                        <input class="btn btn-dark" type="submit" name="deleteTest{{ loop.index }}" value="Delete">
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="5">
+                                        No tests found!
+                                    </td>
+                                </tr>
+                            {% endif %}
+                            </tbody>
+                        </table>
+
+                        <div class="mt-3">
+                            <input class="btn btn-dark btn-lg" type="submit" name = "createTest" value = "Create New Test">
+                        </div>
+
+                        <div class="mt-1">
+                            <input class="btn btn-outline-dark" type="submit" name = "logout" value = "Logout">
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-1"></div>
+
+        </div>
+
+    </div>
+</form>
+
+<script>
+    function confirmAction()
+    {
+        let confirmAction = confirm("Are you sure to modify this test?\nThis will result in any responses to the test to be deleted!");
+        if (confirmAction)
+        {
+            document.getElementById('form').submit();
+        }
+        else
+        {
+            event.preventDefault();
+        }
+    }
+</script>
+{% endblock %}

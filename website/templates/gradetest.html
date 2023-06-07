@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Grade Test{% endblock %}
+
+{% block content %}
+<form method="POST">
+
+     <div class="text-center">
+
+        <div class="row row-cols-3">
+
+            <div class="col-1"></div>
+
+            <div class="col-10">
+                <div class="card border-dark mt-5">
+                    <div class="card-body">
+
+                        <div class="h1">
+                                <b>{{ test.title }}</b>
+                        </div>
+
+                        <table class="table mt-3">
+                            <thead>
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Student Name</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Grade</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% if test.responses %}
+                                {% for response in test.responses %}
+                                <tr>
+                                    <th scope="row">{{ loop.index }}</th>
+                                    <td>
+                                        {{ response.first_name }} {{ response.last_name }}
+                                    </td>
+                                    <td>
+                                        {{ response.email }}
+                                    </td>
+                                    <td>
+                                        {{ response.grade }}
+                                    </td>
+                                    <td>
+                                        <input class="btn btn-dark" type="submit" name="gradeResponse{{ loop.index }}" value="Grade">
+                                        <input class="btn btn-dark" type="submit" name = "sendFeedback{{ loop.index }}" value = "Send Feedback">
+                                        <input class="btn btn-dark" type="submit" name="deleteResponse{{ loop.index }}" value="Delete">
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="5">
+                                        No responses found!
+                                    </td>
+                                </tr>
+                            {% endif %}
+                            </tbody>
+                        </table>
+
+                        <div class="mt-1">
+                            <input class="btn btn-dark" type="submit" name = "gradesReport" value = "Grades Report">
+                        </div>
+
+                        <div class="mt-1">
+                            <input class="btn btn-dark" type="submit" name = "home" value = "Home">
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-1"></div>
+
+        </div>
+
+    </div>
+</form>
+{% endblock %}

@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block title %}Create New Test{% endblock %}
+
+{% block content %}
+<form method="POST">
+
+    <div class="text-center">
+
+        <div class="row row-cols-3">
+
+            <div class="col-1"></div>
+
+            <div class="col-10">
+                <div class="card border-dark mt-5">
+                    <div class="card-body">
+
+                        <div class="h1">
+                                <b>Create New Test</b>
+                        </div>
+
+                        <div class="row row-cols-1 mt-3">
+
+                            <div class="col mt-1">
+                                Test Title
+                            </div>
+
+                            <div class="col mt-1">
+                                <input class="form-control mx-auto w-auto" type="text" name="testName" placeholder="Test Title" {% if test.title %} value="{{ test.title }}" {% endif %}>
+                            </div>
+
+                        </div>
+
+                        <div class="row row-cols-1 mt-1">
+
+                            <div class="col mt-1">
+                                Test Time
+                            </div>
+
+                            <div class="col mt-1">
+                                <input class="form-group" type="number" name="testTime" min="5" max="180" {% if test.time %} value="{{ test.time }}" {% else %} value="5" {% endif %}>
+                            </div>
+
+                        </div>
+
+                        <div class="mt-3">
+                            <input class="btn btn-dark btn-lg" type="submit" name = "saveTest" value = "Save Test">
+                        </div>
+
+                        <div class="mt-1">
+                            <input class="btn btn-outline-dark" type="submit" name = "cancel" value = "Cancel">
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-1"></div>
+
+            {% for question in test.questions %}
+
+            <div class="col-1"></div>
+
+            <div class="col-10">
+                <div class="card border-dark mt-3">
+                    <div class="card-body">
+
+                        <div class="row">
+
+                            <div class="col-1"></div>
+
+                            <div class="col-10 h2">
+                                <b>Question {{ loop.index }}</b>
+                            </div>
+
+                            <div class="col-1">
+                                <input class="btn-close h3" type="submit" name="delete{{ loop.index }}" value=" ">
+                            </div>
+
+                        </div>
+
+                        <select class="form-select mx-auto w-auto mt-1" name="questionType{{ loop.index }}">
+                            <option value="shortAnswer" {% if question.type=="shortAnswer" %} selected {% endif %}>Short Answer</option>
+                            <option value="longAnswer" {% if question.type=="longAnswer" %} selected {% endif %}>Long Answer</option>
+                            <option value="multipleChoice" {% if question.type=="multipleChoice" %} selected {% endif %}>Multiple Choice</option>
+                            <option value="checkboxes" {% if question.type=="checkboxes" %} selected {% endif %}>Checkboxes</option>
+                            <option value="dropdown" {% if question.type=="dropdown" %} selected {% endif %}>Drop-down</option>
+                            <option value="matching" {% if question.type=="matching" %} selected {% endif %}>Matching</option>
+                            <option value="fileUpload" {% if question.type=="fileUpload" %} selected {% endif %}>File Upload</option>
+                        </select>
+
+                        <div class="text-start mt-3">
+                            <b>Question Text</b>
+                        </div>
+
+                        <textarea class="form-control mt-1" rows="3" name="questionText{{ loop.index }}" placeholder="Question Text">{% if question.text %}{{ question.text }}{% endif %}</textarea>
+
+                        <div class="text-start mt-3">
+                            <b>Answer</b>
+                        </div>
+
+                        {% if question.type=="shortAnswer" %}
+                        <input class="form-control mt-1" type="text" name="answerText{{ loop.index }}" placeholder="Answer" {% if question.options %} value="{{ question.options[0].text }}" {% endif %} disabled>
+
+                        {% elif question.type=="longAnswer" %}
+                        <textarea class="form-control mt-1" name="answerText{{ loop.index }}" rows="3" placeholder="Answer" disabled>{% if question.options %}{{question.options[0].text}}{% endif %}</textarea>
+
+                        {% elif question.type=="multipleChoice" or question.type=="checkboxes" or question.type=="dropdown" %}
+                        {% set questionid = loop.index %}
+                            {% for option in question.options %}
+                            <div class="row mt-1">
+
+                                <div class="col-2">
+                                    Option {{ loop.index }}
+                                </div>
+
+                                <div class="col-9">
+                                    <input class="form-control form-control-sm" type="text" name="option{{ questionid }}{{ loop.index }}" placeholder="Answer" {% if option.text %} value="{{ option.text }}" {% endif %}>
+                                </div>
+
+                                <div class="col-1">
+                                    <input class="btn-close" type="submit" name="deleteOption{{ questionid }}{{ loop.index }}" value=" ">
+                                </div>
+
+                            </div>
+                            {% endfor %}
+                            <input class="btn btn-dark mt-1" type="submit" name="addOption{{ loop.index }}" value="Add Option">
+
+                        {% elif question.type=="matching" %}
+                        {% set questionid = loop.index %}
+                            {% for option in question.options %}
+                            <div class="row mt-1">
+
+                                <div class="col-2">
+                                    Option {{ loop.index }}
+                                </div>
+
+                                <div class="col-8">
+                                    <input class="form-control form-control-sm" type="text" name="option{{ questionid }}{{ loop.index }}" placeholder="Answer" {% if option.text %} value="{{ option.text }}" {% endif %}>
+                                </div>
+
+                                <div class="col-1">
+                                    <select class="form-select form-select-sm mx-auto w-auto mt-1" name="row{{ questionid }}{{ loop.index }}">
+                                        <option value="row" {% if option.row %} selected {% endif %}>Row</option>
+                                        <option value="column" {% if not option.row %} selected {% endif %}>Column</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-1">
+                                    <input class="btn-close" type="submit" name="deleteOption{{ questionid }}{{ loop.index }}" value=" ">
+                                </div>
+
+                            </div>
+                            {% endfor %}
+                            <input class="btn btn-dark mt-1" type="submit" name="addOption{{ loop.index }}" value="Add Option">
+
+                        {% elif question.type=="fileUpload" %}
+                        <input class="form-control mt-1" type="file" name="answerText{{ loop.index }}" disabled>
+
+                        {% endif %}
+
+                        <div class="text-start mt-3">
+                            <b>Points</b>
+                            <input class="form-group" type="number" name="points{{ loop.index }}" min="0" {% if question.points %} value="{{ question.points }}" {% else %} value="0" {% endif %} step=".01">
+                        </div>
+
+                        <div class="mt-3">
+                            <input class="btn btn-outline-dark" type="submit" name="update" value="Update Question">
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-1"></div>
+
+            {% endfor %}
+
+        </div>
+
+        <div class="mt-3">
+            <input class="btn btn-dark btn-lg col-10" type="submit" name = "addQuestion" value = "Add Question">
+        </div>
+
+    </div>
+
+</form>
+{% endblock %}
