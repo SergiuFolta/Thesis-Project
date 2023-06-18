@@ -105,7 +105,6 @@ def collectAnswers(response, test):
                         answer.points -= errorPoints
 
                 answer.points = round(answer.points, 2)
-
         else:
             answer.points = 0
         grade += answer.points
@@ -192,8 +191,8 @@ def createReport(test):
     row = 0
     col = 0
     for response in test.responses:
-        worksheet.write(row, col, response.first_name)
-        worksheet.write(row, col + 1, response.last_name)
+        worksheet.write(row, col, response.last_name)
+        worksheet.write(row, col + 1, response.first_name)
         worksheet.write(row, col + 2, response.email)
         worksheet.write(row, col + 3, response.grade)
         row += 1
@@ -214,10 +213,11 @@ def sendFeedback(response, test):
         if question.type in ["multipleChoice", "checkboxes", "dropdown", "matching"] and response.answers[index].answer:
             checked += response.answers[index].answer.split(',')
 
-    subject = 'Results from the ' + test.title
+    subject = response.last_name + ' ' + response.first_name + '\'s results from the ' + test.title
     html = render_template("gradedresponse.html", test=test, response=response, checked=checked)
+    emails = [response.email, current_user.email]
 
-    sendFeedbackEmail(response.email, subject, html, response)
+    sendFeedbackEmail(emails, subject, html, response)
 
 
 @views.route('/', methods=['GET', 'POST'])
